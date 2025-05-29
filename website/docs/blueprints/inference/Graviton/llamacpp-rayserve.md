@@ -66,9 +66,9 @@ Let us see a benchmark result with above steps
 ### Performance
 You have an average latency reduction of 22% with c7g.4xlarge as compared to c6i.4xlarge. Further more, you can find out Graviton performance is more sustainable, even under high concurrency, the latency performance is keeping stable.
 
-![Performance](/gen-ai/inference/llamacpp-rayserve-graviton/images/performance.png)
+![Performance](../img/llamacpp-performance.png)
 
 ### Cost
 The fleet we use consists of 10 4x large machines for worker pods. Using simple AWS calculator the cost in Sydney region for c6i.4xlarge is 0.888 hourly and c7g.4xlarge is 0.7549 hourly. We calculate the cost based on the benchmark duration, then figure out the data in following chart,  Graviton clearly has a benefit of 30% cost saving while also leading in the performance benchmarks, and from the trend you can see the more requests, the more cost saving from Graviton. We are using these numbers for comparison between Intel and Graviton, naturally there are AWS savings such as savings plan can be applied to further reduce cost for both.
 
-![Cost](/gen-ai/inference/llamacpp-rayserve-graviton/images/cost.png)
+![Cost](../img/llamacpp-cost.png)
