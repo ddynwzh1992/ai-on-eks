@@ -48,20 +48,12 @@ resource "kubernetes_storage_class" "default_gp3" {
 }
 
 #---------------------------------------------------------------
-# IRSA for EBS CSI Driver
+# Karpenter Node instance role Access Entry
 #---------------------------------------------------------------
-module "ebs_csi_driver_irsa" {
-  source                = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version               = "~> 5.20"
-  role_name_prefix      = format("%s-%s-", local.name, "ebs-csi-driver")
-  attach_ebs_csi_policy = true
-  oidc_providers = {
-    main = {
-      provider_arn               = module.eks.oidc_provider_arn
-      namespace_service_accounts = ["kube-system:ebs-csi-controller-sa"]
-    }
-  }
-  tags = local.tags
+resource "aws_eks_access_entry" "karpenter_nodes" {
+  cluster_name  = module.eks.cluster_name
+  principal_arn = module.eks_blueprints_addons.karpenter.node_iam_role_arn
+  type          = "EC2_LINUX"
 }
 
 #---------------------------------------------------------------
@@ -76,24 +68,6 @@ module "eks_blueprints_addons" {
   cluster_version   = module.eks.cluster_version
   oidc_provider_arn = module.eks.oidc_provider_arn
 
-  #---------------------------------------
-  # Amazon EKS Managed Add-ons
-  #---------------------------------------
-  eks_addons = {
-    aws-ebs-csi-driver = {
-      service_account_role_arn = module.ebs_csi_driver_irsa.iam_role_arn
-    }
-    coredns = {
-      preserve = true
-    }
-    kube-proxy = {
-      preserve = true
-    }
-    # VPC CNI uses worker node IAM role policies
-    vpc-cni = {
-      preserve = true
-    }
-  }
   enable_aws_efs_csi_driver = var.enable_aws_efs_csi_driver
   #---------------------------------------
   # AWS Load Balancer Controller Add-on
@@ -199,14 +173,6 @@ module "eks_blueprints_addons" {
 
   tags = local.tags
 
-  #---------------------------------------
-  # CloudWatch metrics for EKS
-  #---------------------------------------
-  enable_aws_cloudwatch_metrics = var.enable_aws_cloudwatch_metrics
-  aws_cloudwatch_metrics = {
-    values = [templatefile("${path.module}/helm-values/aws-cloudwatch-metrics-values.yaml", {})]
-  }
-
 }
 
 #---------------------------------------------------------------
@@ -215,7 +181,7 @@ module "eks_blueprints_addons" {
 
 module "data_addons" {
   source  = "aws-ia/eks-data-addons/aws"
-  version = "1.37.0"
+  version = "1.37.1"
 
   oidc_provider_arn = module.eks.oidc_provider_arn
 
@@ -284,7 +250,7 @@ module "data_addons" {
   #---------------------------------------------------------------
   enable_nvidia_device_plugin = true
   nvidia_device_plugin_helm_config = {
-    version = "v0.16.1"
+    version = "v0.17.1"
     name    = "nvidia-device-plugin"
     values = [
       <<-EOT
@@ -425,6 +391,8 @@ module "data_addons" {
       clusterName: ${module.eks.cluster_name}
       ec2NodeClass:
         amiFamily: Bottlerocket
+        amiSelectorTerms:
+          - alias: bottlerocket@latest
         karpenterRole: ${split("/", module.eks_blueprints_addons.karpenter.node_iam_role_arn)[1]}
         subnetSelectorTerms:
           id: ${module.vpc.private_subnets[2]}
@@ -487,6 +455,8 @@ module "data_addons" {
       clusterName: ${module.eks.cluster_name}
       ec2NodeClass:
         amiFamily: Bottlerocket
+        amiSelectorTerms:
+          - alias: bottlerocket@latest
         karpenterRole: ${split("/", module.eks_blueprints_addons.karpenter.node_iam_role_arn)[1]}
         subnetSelectorTerms:
           id: ${module.vpc.private_subnets[3]}
@@ -708,16 +678,6 @@ resource "aws_secretsmanager_secret_version" "grafana" {
 
 resource "kubectl_manifest" "neuron_monitor" {
   yaml_body  = file("${path.module}/monitoring/neuron-monitor-daemonset.yaml")
-  depends_on = [module.eks_blueprints_addons]
-}
-
-resource "kubectl_manifest" "dcgm" {
-  yaml_body  = file("${path.module}/monitoring/dcgm.yaml")
-  depends_on = [module.eks_blueprints_addons]
-}
-
-resource "kubectl_manifest" "dcgm_service" {
-  yaml_body  = file("${path.module}/monitoring/dcgm-service.yaml")
   depends_on = [module.eks_blueprints_addons]
 }
 

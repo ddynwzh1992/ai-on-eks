@@ -43,6 +43,7 @@ Each stack inherits the `base` stack's components. These components include:
 | `eks_cluster_version`                    | The version of EKS to use                           | 1.32                     |
 | `vpc_cidr`                               | The CIDR used for the VPC                           | `10.1.0.0/21`            |
 | `secondary_cidr_blocks`                  | Secondary CIDR for the VPC                          | `100.64.0.0/16`          |
+| `enable_database_subnets`                | Whether or not to enable the database subnets       | `false`                  |
 | `enable_aws_cloudwatch_metrics`          | Enable the AWS Cloudwatch Metrics addon             | `false`                  |
 | `bottlerocket_data_disk_snapshot_id`     | Attach a snapshot ID to the deployed nodes          | `""`                     |
 | `enable_aws_efs_csi_driver`              | Enable the AWS EFS CSI driver                       | `false`                  |
@@ -53,8 +54,10 @@ Each stack inherits the `base` stack's components. These components include:
 | `enable_amazon_emr`                      | Set up Amazon EMR                                   | `false`                  |
 | `enable_kube_prometheus_stack`           | Enable the Kube Prometheus addon                    | `false`                  |
 | `enable_kubecost`                        | Enable Kubecost                                     | `false`                  |
+| `enable_ai_ml_observability_stack`       | Enable AI/ML observability addon                    | `false`                  |
 | `enable_argo_workflows`                  | Enable Argo Workflow                                | `false`                  |
 | `enable_argo_events`                     | Enable Argo Events                                  | `false`                  |
+| `enable_argocd`                          | Enable ArgoCD addon                                 | `false`                  |
 | `enable_mlflow_tracking`                 | Enable MLFlow Tracking                              | `false`                  |
 | `enable_jupyterhub`                      | Enable JupyterHub                                   | `false`                  |
 | `enable_volcano`                         | Enable Volcano                                      | `false`                  |
@@ -62,7 +65,9 @@ Each stack inherits the `base` stack's components. These components include:
 | `huggingface_token`                      | Hugging Face token to use in environment            | `DUMMY_TOKEN_REPLACE_ME` |
 | `enable_rayserve_ha_elastic_cache_redis` | Enable Rayserve high availability using ElastiCache | `false`                  |
 | `enable_torchx_etcd`                     | Enable etcd for torchx                              | `false`                  |
-| `enable_mpi_operator`                    | Enable the MPIO perator                             | `false`                  |
+| `enable_mpi_operator`                    | Enable the MPI Operator                             | `false`                  |
+| `enable_aibrix_stack`                    | Enable the AIBrix stack                             | `false`                  |
+| `aibrix_stack_version`                   | AIBrix Stack version                                | `v0.2.1`                 |
 
 ### JupyterHub
 
