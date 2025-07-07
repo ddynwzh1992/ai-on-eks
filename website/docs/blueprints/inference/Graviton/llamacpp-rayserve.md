@@ -1,3 +1,15 @@
+---
+title: RayServe with llama.cpp
+sidebar_position: 1
+---
+import CollapsibleContent from '../../../../src/components/CollapsibleContent';
+
+:::caution
+
+The example model used in this blueprint [bartowski/Llama-3.2-1B-Instruct-GGUF](https://huggingface.co/bartowski/Llama-3.2-1B-Instruct-GGUF) requires access through a Hugging Face account.
+
+:::
+
 # Cost effective and Scalable Model Inference on AWS Graviton with Ray on EKS
 
 ## Overview
