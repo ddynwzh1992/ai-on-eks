@@ -1,6 +1,5 @@
 ---
 title: RayServe with llama.cpp
-sidebar_position: 1
 ---
 import CollapsibleContent from '../../../../src/components/CollapsibleContent';
 
